@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: employee-frontend-uat
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/achalpadol/EKS-helm-ArgoCD-Repo.git
+    targetRevision: main
+    path: dev-chart
+
+    helm:
+      valueFiles:
+        - values-uat.yaml
+
+      parameters:
+        - name: frontend.enabled
+          value: "true"
+        - name: backend.enabled
+          value: "false"
+        - name: database.enabled
+          value: "false"
+        - name: configMap.enabled
+          value: "false"
+        - name: secret.enabled
+          value: "false"
+
+  destination:
+    server: https://7CCA12B078E77BB8AEA7A2549424BA2A.gr7.ap-south-1.eks.amazonaws.com
+    namespace: app-uat
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

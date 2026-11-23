@@ -1,0 +1,41 @@
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: employee-db-qa
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/achalpadol/EKS-helm-ArgoCD-Repo.git
+    targetRevision: main
+    path: dev-chart
+
+    helm:
+      valueFiles:
+        - values-qa.yaml
+
+      parameters:
+        - name: frontend.enabled
+          value: "false"
+        - name: backend.enabled
+          value: "false"
+        - name: database.enabled
+          value: "true"
+        - name: configMap.enabled
+          value: "true"
+        - name: secret.enabled
+          value: "true"
+
+  destination:
+    server: https://7CCA12B078E77BB8AEA7A2549424BA2A.gr7.ap-south-1.eks.amazonaws.com
+    namespace: app-qa
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
